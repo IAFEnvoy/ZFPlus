@@ -18,10 +18,7 @@
 
 ## 安装方式
 
-1. 在浏览器中安装 **Tampermonkey**（油猴）扩展。
-   - Chrome / Edge：[Tampermonkey](https://www.tampermonkey.net/)
-   - Firefox：[Tampermonkey](https://addons.mozilla.org/zh-CN/firefox/addon/tampermonkey/)
-  其他类似扩展皆可（作者本人使用的是`脚本猫`）
+1. 在浏览器中安装 **Tampermonkey**（油猴）扩展或者其他类似扩展（作者本人使用的是`脚本猫`）。
 2. 打开 Tampermonkey 控制面板，点击"添加新脚本"。
 3. 将 `鼠鼠选课plus.js` 的完整内容复制粘贴到编辑器中。
 4. 保存脚本（Ctrl+S），确保脚本已启用。
