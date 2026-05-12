@@ -14,8 +14,8 @@
 /*
 鼠鼠选课插件 Ultra-v1.1（油猴脚本）
 基于 v0.7 进阶增强：
-- 课表显示极致优化：底层采用 CSS Grid 布局，强制均分 16 等份小格，彻底解决不对齐问题（重度强迫症福音）
-- 分隔线调整：每个星期日（每天列）之间加入粗线，前后8周之间加入细线
+- 课表显示极致优化：底层采用 CSS Grid 布局，强制均分 16 等份小格，彻底解决不对齐问题（重度强迫症福音）；连续图块不再截断（直接显示 1-16 等）
+- 分隔线调整：每个星期日（每天列）之间加入粗线，并在格子背景的第8/9周之间加入独立细线作为参考
 - 交互增强：课表图块白边加粗大字号，标题点击搜索课程，点击课表块滚动定位
 - 算法增强：实时计算选上概率（概率、排名/容量）
 - 链接替换：修改教师跳转逻辑，弹窗直达 course-rate.icu 评价列表
@@ -120,11 +120,8 @@ function drawTable(table) {
       let segments = [];
       let current = { ...table[i][j][1], start: 1, end: 1 };
       for (let w = 2; w <= 16; w++) {
-        // 在第8和第9周之间切断，确保前后半学期能独立显示
-        if (w === 9) {
-          segments.push(current);
-          current = { ...table[i][j][w], start: w, end: w };
-        } else if (table[i][j][w].color === current.color && table[i][j][w].kch_id === current.kch_id) {
+        // 不再从中间截断，连续的课程直接合并为 1-16 周
+        if (table[i][j][w].color === current.color && table[i][j][w].kch_id === current.kch_id) {
           current.end = w;
         } else {
           segments.push(current);
@@ -137,14 +134,10 @@ function drawTable(table) {
         let block = document.createElement('div');
         // 【严格对齐】使用 CSS Grid 替代 Flex 百分比，强制均分 16 等份格子，彻底治愈强迫症
         block.style.gridColumn = `${seg.start} / ${seg.end + 1}`;
+        block.style.gridRow = '1 / 2';
         block.style.height = '100%';
         block.style.backgroundColor = seg.color;
         block.style.boxSizing = 'border-box';
-
-        if (seg.end === 8) {
-          // 【半学期细线】前后8周之间是灰线
-          block.style.borderRight = '2px solid #999';
-        }
 
         if (seg.color !== 'yellowgreen') {
           block.innerText = seg.start === seg.end ? `${seg.start}` : `${seg.start}-${seg.end}`;
@@ -177,6 +170,17 @@ function drawTable(table) {
         bgContainer.appendChild(block);
       }
       ele.appendChild(bgContainer);
+
+      // 【半学期细线】在格子的正中间（第8和第9周之间）画一条细线，独立于色块
+      let overlayLine = document.createElement('div');
+      overlayLine.style.position = 'absolute';
+      overlayLine.style.left = '50%';
+      overlayLine.style.top = '0';
+      overlayLine.style.bottom = '0';
+      overlayLine.style.borderLeft = '1.5px solid #999';
+      overlayLine.style.pointerEvents = 'none'; // 鼠标穿透，不影响原本的 hover 和点击
+      overlayLine.style.zIndex = '2'; // 绘制在最上层
+      ele.appendChild(overlayLine);
     }
   }
 }
